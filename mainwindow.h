@@ -40,9 +40,8 @@ public:
 private:
     /* 申明变量 */
     /* 按钮 */
-    QPushButton *pushButton_graph;
-    QPushButton *pushButton_camera;
-    QPushButton *pushButton_refresh;
+    QPushButton *camera_pushbutton;
+    QPushButton *t_h_pushbutton;
 
     /* LED */
     QSlider *led_horizontalSlider;
@@ -66,24 +65,26 @@ private:
     QTimer *t_h_timer;
 
     /* 串口 */
+    QPushButton *serial_connect;
+    QPushButton *serial_refresh;
     QSerialPort *serial_port;
-    QComboBox *serial_combobox;
+    QComboBox *serial_combobox[2];
     QVBoxLayout *serial_vboxlayout; //垂直分布
     QGridLayout *serial_gridlayout; //网络布局
 
     QWidget *serial_funcwidget;
     QWidget *serial_mainwidget;
-    QLabel *serial_label_number;
+    QLabel *serial_label_number[2];
 
     /* 网络 */
-    QPushButton *pushButton_net_get;
-    QPushButton *pushButton_net_clean;  //清除浏览框内容按键
+    QPushButton *net_get;
+    QPushButton *net_clean;  //清除浏览框内容按键
 
-    QTextBrowser *textBrowser_net;      //文本浏览框
-    QWidget *vWidget_net;               //垂直widget容器
-    QVBoxLayout *vBoxLayout_net;        //垂直布局
+    QTextBrowser *net_textbrowser;      //文本浏览框
+    QWidget *net_vwidget;               //垂直widget容器
+    QVBoxLayout *net_vboxlayout;        //垂直布局
 
-    QTimer *timer_net;                  //定时器
+    QTimer *net_timer;                  //定时器
 
 
     /* 初始化函数 */

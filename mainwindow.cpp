@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     init_led();
     init_pushbutton_function();
-//    init_serial_port();
+    init_serial_port();
     init_network();
 }
 
@@ -61,29 +61,29 @@ void MainWindow::init_led()
 }
 
 /****************** 按钮 ********************/
-void MainWindow::pushButton_graph_Clicked()
+void MainWindow::pushButton_camera_Clicked()
 {
 //    this->close();
 }
 
-void MainWindow::pushButton_camera_Clicked()
+void MainWindow::pushButton_graph_Clicked()
 {
     init_sensor_t_h();
 }
 
 void MainWindow::init_pushbutton_function()
 {
-    pushButton_graph = new QPushButton("监控", this);
-    pushButton_camera = new QPushButton("温湿度", this);
+    camera_pushbutton = new QPushButton("监控", this);
+    t_h_pushbutton = new QPushButton("温湿度", this);
 
     /* 设置显示的位置与大小 */
-    pushButton_graph->setGeometry(300, 200, 80, 40);
-    pushButton_camera->setGeometry(400, 200, 80, 40);
+    t_h_pushbutton->setGeometry(300, 200, 80, 40);
+    camera_pushbutton->setGeometry(400, 200, 80, 40);
 
     /* 信号槽 */
-    connect(pushButton_graph, SIGNAL(clicked()),this,
+    connect(t_h_pushbutton, SIGNAL(clicked()),this,
                 SLOT(pushButton_graph_Clicked()));
-    connect(pushButton_camera, SIGNAL(clicked()),this,
+    connect(camera_pushbutton, SIGNAL(clicked()),this,
                 SLOT(pushButton_camera_Clicked()));
 }
 
@@ -167,91 +167,105 @@ void MainWindow::t_h_receive_date(int value)
 /******************* serial port ***********************/
 void MainWindow::init_serial_port()
 {
+    serial_connect = new QPushButton("connect",this);
+    serial_refresh = new QPushButton("refresh",this);
     serial_port = new QSerialPort(this);
     serial_gridlayout = new QGridLayout();
     serial_vboxlayout = new QVBoxLayout();
-    serial_funcwidget = new QWidget();
-    serial_mainwidget = new QWidget();
+    serial_funcwidget = new QWidget(this);
+    serial_mainwidget = new QWidget(this);
 
-    serial_label_number = new QLabel();
-    serial_label_number->setText("串口号");
-    serial_label_number->setMinimumSize(80, 30);
-    /* 自动调整大小 */
-    serial_label_number->setSizePolicy(
+    /* QList 链表，字符串类型 */
+    QList <QString> list1;
+    list1<<"串口号"<<"波特率";
+
+    for(int i = 0; i < 2; i++){
+        serial_label_number[i] = new QLabel(list1[i]);
+        serial_label_number[i]->setMinimumSize(20, 15);
+
+        /* 自动调整大小 */
+        serial_label_number[i]->setSizePolicy(
                 QSizePolicy::Expanding,
                 QSizePolicy::Expanding);
-    serial_gridlayout->addWidget(serial_label_number, 0, 0,Qt::AlignLeft);//添加到坐标(0，0)
+        serial_gridlayout->addWidget(serial_label_number[i], 0, i);//添加到坐标(0，i)
 
-    serial_combobox = new QComboBox();
-    serial_combobox->setMinimumSize(80, 30);
-    /* 自动调整大小 */
-    serial_combobox->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    serial_gridlayout->addWidget(serial_combobox,0,1,Qt::AlignLeft);//添加到坐标(1，0)
+        serial_combobox[i] = new QComboBox();
+        serial_combobox[i]->setMinimumSize(20, 15);
+
+        /* 自动调整大小 */
+        serial_combobox[i]->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+        serial_gridlayout->addWidget(serial_combobox[i],1,i);//添加到坐标(1，0)
+    }
+
+    serial_gridlayout->addWidget(serial_connect,0,2);
+    serial_gridlayout->addWidget(serial_refresh,1,2);
 
     /* 布局 */
     serial_funcwidget->setLayout(serial_gridlayout);
     serial_vboxlayout->addWidget(serial_funcwidget);
-    serial_mainwidget->setLayout(serial_vboxlayout);
-    this->setCentralWidget(serial_mainwidget);
+    serial_mainwidget->setLayout(serial_vboxlayout);   
 
     /* QList 链表，字符串类型 */
-    QList <QString> list;
-    list<<"1200"<<"2400"<<"4800"<<"9600"
+    QList <QString> list2;
+    list2<<"1200"<<"2400"<<"4800"<<"9600"
         <<"19200"<<"38400"<<"57600"
         <<"115200"<<"230400"<<"460800"
       <<"921600";
     for (int i = 0; i < 11; i++) {
-        serial_combobox->addItem(list[i]);
+        serial_combobox[1]->addItem(list2[i]);
     }
-    serial_combobox->setCurrentIndex(7);
+    serial_combobox[1]->setCurrentIndex(7);
+
+    /* 设置区域大小，后续根据要求修改 */
+    serial_mainwidget->setGeometry(0,0,300,80);
 
 }
 
 /******************* newwork ***********************/
 void MainWindow::init_network()
 {
-    pushButton_net_get = new QPushButton("获得本机信息",this);
-    pushButton_net_clean = new QPushButton("清空",this);
-    vWidget_net = new QWidget(this);
-    vBoxLayout_net = new QVBoxLayout();
-    textBrowser_net = new QTextBrowser();
-    timer_net = new QTimer();
+    net_get = new QPushButton("获得本机信息",this);
+    net_clean = new QPushButton("清空",this);
+    net_vwidget = new QWidget(this);
+    net_vboxlayout = new QVBoxLayout();
+    net_textbrowser = new QTextBrowser();
+    net_timer = new QTimer();
 
     /* 添加到垂直布局 */
-    vBoxLayout_net->addWidget(pushButton_net_get);
-    vWidget_net->setLayout(vBoxLayout_net);
+    net_vboxlayout->addWidget(net_get);
+    net_vwidget->setLayout(net_vboxlayout);
 
-    vBoxLayout_net->addWidget(textBrowser_net);
-    vWidget_net->setLayout(vBoxLayout_net);
+    net_vboxlayout->addWidget(net_textbrowser);
+    net_vwidget->setLayout(net_vboxlayout);
 
-    vBoxLayout_net->addWidget(pushButton_net_clean);
-    vWidget_net->setLayout(vBoxLayout_net);
+    net_vboxlayout->addWidget(net_clean);
+    net_vwidget->setLayout(net_vboxlayout);
 
     /* 设置区域大小，后续根据要求修改 */
-    vWidget_net->setGeometry(600,120,200,240);
+    net_vwidget->setGeometry(600,120,200,240);
 
     /* 信号槽 */
-    connect(pushButton_net_get,SIGNAL(clicked()),
+    connect(net_get,SIGNAL(clicked()),
                 this,SLOT(network_timerstart()));
-    connect(pushButton_net_clean,SIGNAL(clicked()),
+    connect(net_clean,SIGNAL(clicked()),
                 this,SLOT(network_clearhostinfo()));
-    connect(timer_net,SIGNAL(timeout()),
+    connect(net_timer,SIGNAL(timeout()),
                 this,SLOT(network_timeout()));
 
 }
 
 void MainWindow::network_timerstart()
 {
-    textBrowser_net->clear();
+    net_textbrowser->clear();
 
-    timer_net->start(1000);//定时1s
+    net_timer->start(1000);//定时1s
 }
 
 void MainWindow::network_timeout()
 {
     network_showhostinfo();
 
-    timer_net->stop();//停止定时
+    net_timer->stop();//停止定时
 }
 
 QString MainWindow::network_gethostinfo()
@@ -287,11 +301,11 @@ QString MainWindow::network_gethostinfo()
 
 void MainWindow::network_showhostinfo()
 {
-    textBrowser_net->insertPlainText(network_gethostinfo());
+    net_textbrowser->insertPlainText(network_gethostinfo());
 }
 
 void MainWindow::network_clearhostinfo()
 {
-    if(!textBrowser_net->toPlainText().isEmpty())
-        textBrowser_net->clear();
+    if(!net_textbrowser->toPlainText().isEmpty())
+        net_textbrowser->clear();
 }
