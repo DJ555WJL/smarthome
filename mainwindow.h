@@ -9,6 +9,7 @@
 #include <QSlider>
 #include <QLabel>
 #include <QGroupBox>
+#include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QChartView>
 #include <QSplineSeries>
@@ -23,6 +24,7 @@
 #include <QGridLayout>
 #include <QMessageBox>
 #include <QComboBox>
+
 
 /* 图标实验  必须添加命名空间 */
 QT_CHARTS_USE_NAMESPACE
@@ -73,12 +75,26 @@ private:
     QWidget *serial_mainwidget;
     QLabel *serial_label_number;
 
+    /* 网络 */
+    QPushButton *pushButton_net_get;
+    QPushButton *pushButton_net_clean;  //清除浏览框内容按键
+
+    QTextBrowser *textBrowser_net;      //文本浏览框
+    QWidget *vWidget_net;               //垂直widget容器
+    QVBoxLayout *vBoxLayout_net;        //垂直布局
+
+    QTimer *timer_net;                  //定时器
+
 
     /* 初始化函数 */
     void init_led();
     void init_pushbutton_function();
     void init_sensor_t_h();
     void init_serial_port();
+    void init_network();
+
+    QString network_gethostinfo();//获取本机的网络的信息，返回类型是QString
+
 
 private slots:
     /* 槽函数  */
@@ -92,5 +108,11 @@ private slots:
     /* 图表 */
     void t_h_timeout();
     void t_h_receive_date(int value);
+
+    /* 网络 */
+    void network_timeout();
+    void network_showhostinfo();
+    void network_timerstart();
+    void network_clearhostinfo();
 };
 #endif // MAINWINDOW_H

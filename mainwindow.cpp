@@ -1,5 +1,9 @@
 #include "mainwindow.h"
 #include <QDateTime>
+#include <QNetworkInterface>
+#include <QHostInfo>
+#include <QThread>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -9,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     init_led();
     init_pushbutton_function();
 //    init_serial_port();
+    init_network();
 }
 
 MainWindow::~MainWindow()
@@ -200,4 +205,93 @@ void MainWindow::init_serial_port()
     }
     serial_combobox->setCurrentIndex(7);
 
+}
+
+/******************* newwork ***********************/
+void MainWindow::init_network()
+{
+    pushButton_net_get = new QPushButton("获得本机信息",this);
+    pushButton_net_clean = new QPushButton("清空",this);
+    vWidget_net = new QWidget(this);
+    vBoxLayout_net = new QVBoxLayout();
+    textBrowser_net = new QTextBrowser();
+    timer_net = new QTimer();
+
+    /* 添加到垂直布局 */
+    vBoxLayout_net->addWidget(pushButton_net_get);
+    vWidget_net->setLayout(vBoxLayout_net);
+
+    vBoxLayout_net->addWidget(textBrowser_net);
+    vWidget_net->setLayout(vBoxLayout_net);
+
+    vBoxLayout_net->addWidget(pushButton_net_clean);
+    vWidget_net->setLayout(vBoxLayout_net);
+
+    /* 设置区域大小，后续根据要求修改 */
+    vWidget_net->setGeometry(600,120,200,240);
+
+    /* 信号槽 */
+    connect(pushButton_net_get,SIGNAL(clicked()),
+                this,SLOT(network_timerstart()));
+    connect(pushButton_net_clean,SIGNAL(clicked()),
+                this,SLOT(network_clearhostinfo()));
+    connect(timer_net,SIGNAL(timeout()),
+                this,SLOT(network_timeout()));
+
+}
+
+void MainWindow::network_timerstart()
+{
+    textBrowser_net->clear();
+
+    timer_net->start(1000);//定时1s
+}
+
+void MainWindow::network_timeout()
+{
+    network_showhostinfo();
+
+    timer_net->stop();//停止定时
+}
+
+QString MainWindow::network_gethostinfo()
+{
+    /* 获取主机名称 */
+    QString str = "主机名称：" + QHostInfo::localHostName() + "\n";
+
+    /* 获取所有网络接口 */
+    QList<QNetworkInterface> list
+            = QNetworkInterface::allInterfaces();
+
+    /* 遍历list */
+    foreach(QNetworkInterface interface, list){
+        str+="网络设置：" + interface.name() + "\n";
+        str+="MAC地址：" + interface.hardwareAddress() + "\n";
+
+        QList<QNetworkAddressEntry> entryList
+                = interface.addressEntries();
+
+        /* 遍历entryList */
+        foreach(QNetworkAddressEntry entry,entryList){
+            /* 过滤IPV6地址，只留下IPV4 */
+            if(entry.ip().protocol() == QAbstractSocket::IPv4Protocol){
+                str+="IP 地址：" + entry.ip().toString() + "\n";
+                str+="子网掩码：" + entry.netmask().toString() + "\n";
+                str+="广播地址：" + entry.broadcast().toString() + "\n";
+            }
+        }
+    }
+
+    return str;
+}
+
+void MainWindow::network_showhostinfo()
+{
+    textBrowser_net->insertPlainText(network_gethostinfo());
+}
+
+void MainWindow::network_clearhostinfo()
+{
+    if(!textBrowser_net->toPlainText().isEmpty())
+        textBrowser_net->clear();
 }
