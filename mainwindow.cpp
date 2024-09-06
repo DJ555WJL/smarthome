@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     init_pushbutton_function();
     init_serial_port();
     init_network();
+    init_usbbluetooth();
 }
 
 MainWindow::~MainWindow()
@@ -42,16 +43,22 @@ void MainWindow::init_led()
     led_verticalSlider = new QSlider(Qt::Vertical,this);
     led_label_h = new QLabel("亮度: 0",this);
     led_label_v = new QLabel("亮度: 0",this);
+    led_groupbox = new QGroupBox(tr("LED"),this);
+    led_vboxlayout = new QVBoxLayout();
 
-    /* 设置显示的位置与大小 */
-    led_horizontalSlider->setGeometry(10, 350, 150, 20);
-    led_verticalSlider->setGeometry(200, 220, 20, 150);
-    led_label_h->setGeometry(10, 320, 200, 20);
-    led_label_v->setGeometry(130, 260, 200, 20);
+    led_vboxlayout->addWidget(led_label_h);
+    led_vboxlayout->addWidget(led_horizontalSlider);
+    led_vboxlayout->addWidget(led_verticalSlider);
+    led_vboxlayout->addWidget(led_label_v);
+
+    led_groupbox->setLayout(led_vboxlayout);
 
     /* 设置滑条 值的大小 */
     led_horizontalSlider->setRange(0, 100);
     led_verticalSlider->setRange(0, 100);
+
+    /* 设置区域大小，后续根据要求修改 */
+    led_groupbox->setGeometry(10, 250, 140, 200);
 
     /* 信号槽 */
     connect(led_horizontalSlider,SIGNAL(valueChanged(int)),
@@ -242,7 +249,7 @@ void MainWindow::init_network()
     net_vwidget->setLayout(net_vboxlayout);
 
     /* 设置区域大小，后续根据要求修改 */
-    net_vwidget->setGeometry(600,120,200,240);
+    net_vwidget->setGeometry(600,10,200,450);
 
     /* 信号槽 */
     connect(net_get,SIGNAL(clicked()),
@@ -308,4 +315,28 @@ void MainWindow::network_clearhostinfo()
 {
     if(!net_textbrowser->toPlainText().isEmpty())
         net_textbrowser->clear();
+}
+
+/******************* usb bluetooth ***********************/
+void MainWindow::init_usbbluetooth()
+{
+    usbbt_vboxlayout = new QVBoxLayout();
+    usbbt_groupbox = new QGroupBox(tr("usb bluttooth"),this);
+
+    /* QList 链表，字符串类型 */
+    QList <QString> list;
+    list<<"开始扫描"<<"停止扫描"<<"连接"<<"断开";
+
+    for(int i = 0; i < 4; i++)
+    {
+        usbbt_pushbutton[i] = new QPushButton();
+        usbbt_pushbutton[i]->setText(list[i]);
+        usbbt_vboxlayout->addWidget(usbbt_pushbutton[i]);
+    }
+
+    /* vboxLayout布局设置为groupBox布局 */
+    usbbt_groupbox->setLayout(usbbt_vboxlayout);
+
+    /* 设置区域大小，后续根据要求修改 */
+    usbbt_groupbox->setGeometry(300,250,160,200);
 }

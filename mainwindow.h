@@ -24,6 +24,7 @@
 #include <QGridLayout>
 #include <QMessageBox>
 #include <QComboBox>
+#include <QGroupBox>
 
 
 /* 图标实验  必须添加命名空间 */
@@ -48,8 +49,9 @@ private:
     QSlider *led_verticalSlider;
     QLabel *led_label_h;
     QLabel *led_label_v;
-    QGroupBox *led_groupBox;
-    QVBoxLayout *led_vBoxLayout;
+    QGroupBox *led_groupbox;
+    QVBoxLayout *led_vboxlayout;
+
 
     /*  温湿度图表  */
     int t_h_maxsize;                 //数据最大接收值
@@ -86,6 +88,11 @@ private:
 
     QTimer *net_timer;                  //定时器
 
+    /* usb bluetooth */
+    QPushButton *usbbt_pushbutton[4];
+    QVBoxLayout *usbbt_vboxlayout;
+    QGroupBox *usbbt_groupbox;
+
 
     /* 初始化函数 */
     void init_led();
@@ -93,6 +100,7 @@ private:
     void init_sensor_t_h();
     void init_serial_port();
     void init_network();
+    void init_usbbluetooth();
 
     QString network_gethostinfo();//获取本机的网络的信息，返回类型是QString
 
